@@ -10,6 +10,7 @@ import MapPage from './pages/MapPage';
 import DeliveriesPage from './pages/DeliveriesPage';
 import DriversPage from './pages/DriversPage';
 import SettingsPage from './pages/SettingsPage';
+import AuditPage from './pages/AuditPage';
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
@@ -86,6 +87,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <AppLayout><SettingsPage /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/audit"
+            element={
+              <ProtectedRoute roles={['admin', 'dispatcher']}>
+                <AppLayout><AuditPage /></AppLayout>
               </ProtectedRoute>
             }
           />

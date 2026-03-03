@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import type { Delivery } from '../types';
+import type { Delivery, OptimizedRoutes } from '../types';
 
 let socket: Socket | null = null;
 
@@ -37,12 +37,17 @@ export const onDeliveryUpdate = (callback: (data: Delivery) => void) => {
   socket?.on('delivery_update', callback);
 };
 
-export const offLocationUpdate = () => {
-  socket?.off('location_update');
+export const onRouteUpdate = (callback: (data: { routes: OptimizedRoutes }) => void) => {
+  socket?.on('route_update', callback);
 };
 
-export const offDeliveryUpdate = () => {
-  socket?.off('delivery_update');
+export const onDriverIncident = (callback: (data: { driver: { id: string; name: string }; reason: string; reassignments: unknown[] }) => void) => {
+  socket?.on('driver_incident', callback);
 };
+
+export const offLocationUpdate = () => { socket?.off('location_update'); };
+export const offDeliveryUpdate = () => { socket?.off('delivery_update'); };
+export const offRouteUpdate = () => { socket?.off('route_update'); };
+export const offDriverIncident = () => { socket?.off('driver_incident'); };
 
 export const getSocket = () => socket;

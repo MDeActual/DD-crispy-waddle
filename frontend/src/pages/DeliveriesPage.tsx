@@ -37,8 +37,8 @@ const DeliveriesPage: React.FC = () => {
   const loadData = () => {
     Promise.all([deliveriesApi.getAll(), driversApi.getAll()])
       .then(([dRes, drRes]) => {
-        setDeliveries(dRes.data);
-        setDrivers(drRes.data);
+        setDeliveries(dRes.data.deliveries ?? dRes.data);
+        setDrivers(drRes.data.drivers ?? drRes.data);
       })
       .catch(console.error)
       .finally(() => setLoading(false));

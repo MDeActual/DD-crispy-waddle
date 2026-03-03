@@ -37,12 +37,27 @@ export const driversApi = {
   getAll: () => api.get('/drivers'),
   updateLocation: (id: string, lat: number, lng: number) =>
     api.put(`/drivers/${id}/location`, { lat, lng }),
+  updateStatus: (id: string, status: string) =>
+    api.patch(`/drivers/${id}/status`, { status }),
+  reportIncident: (id: string, reason: string) =>
+    api.post(`/drivers/${id}/incident`, { reason }),
 };
 
 export const deliveriesApi = {
   getAll: () => api.get('/deliveries'),
   create: (data: Record<string, unknown>) => api.post('/deliveries', data),
   update: (id: string, data: Record<string, unknown>) => api.put(`/deliveries/${id}`, data),
+};
+
+export const routesApi = {
+  getRoutes: () => api.get('/routes'),
+  optimize: () => api.post('/routes/optimize'),
+};
+
+export const auditApi = {
+  getChain: () => api.get('/audit'),
+  getRecent: (limit = 20) => api.get(`/audit/recent?limit=${limit}`),
+  verify: () => api.get('/audit/verify'),
 };
 
 export default api;

@@ -1,7 +1,9 @@
 const express = require('express');
 const { deliveries, drivers } = require('../store');
 const { authenticate, requireRole } = require('../middleware');
-const { emitDeliveryUpdate } = require('../socket');
+const { emitDeliveryUpdate, emitRouteUpdate } = require('../socket');
+const { assignPendingDeliveries, getOptimizedRoutes } = require('../ai/routeOptimizer');
+const { addBlock, EVENT } = require('../blockchain/ledger');
 
 const router = express.Router();
 
@@ -71,7 +73,24 @@ router.post('/', authenticate, requireRole('admin', 'dispatcher'), (req, res) =>
   }
 
   deliveries.push(newDelivery);
+
+  // Blockchain audit
+  addBlock(EVENT.DELIVERY_CREATED, {
+    deliveryId: newDelivery.id,
+    trackingNumber: newDelivery.trackingNumber,
+    recipient: newDelivery.recipient,
+    createdBy: req.user.id,
+  });
+
   emitDeliveryUpdate({ ...newDelivery });
+
+  // AI: try to auto-assign unassigned pending deliveries
+  const assignments = assignPendingDeliveries();
+  if (assignments.length > 0) {
+    addBlock(EVENT.ROUTE_OPTIMIZED, { trigger: 'delivery_created', assignments });
+    const routes = getOptimizedRoutes();
+    emitRouteUpdate({ routes });
+  }
 
   return res.status(201).json({ message: 'Delivery created', delivery: newDelivery });
 });
@@ -98,6 +117,12 @@ router.put('/:id', authenticate, (req, res) => {
       return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` });
     }
     delivery.status = status;
+    addBlock(EVENT.DELIVERY_UPDATED, {
+      deliveryId: delivery.id,
+      trackingNumber: delivery.trackingNumber,
+      status,
+      updatedBy: req.user.id,
+    });
     emitDeliveryUpdate({ ...delivery });
     return res.json({ message: 'Delivery updated', delivery });
   }
@@ -130,6 +155,24 @@ router.put('/:id', authenticate, (req, res) => {
   }
 
   emitDeliveryUpdate({ ...delivery });
+
+  // Log blockchain event
+  const blockData = { deliveryId: delivery.id, updatedBy: req.user.id };
+  if (req.body.status !== undefined) blockData.status = delivery.status;
+  if (req.body.driverId !== undefined) blockData.driverId = delivery.driverId;
+  addBlock(EVENT.DELIVERY_UPDATED, blockData);
+
+  // If driver was assigned/changed, re-emit optimised routes
+  if (req.body.driverId !== undefined) {
+    addBlock(EVENT.DRIVER_ASSIGNED, {
+      deliveryId: delivery.id,
+      driverId: delivery.driverId,
+      assignedBy: req.user.id,
+    });
+    const routes = getOptimizedRoutes();
+    emitRouteUpdate({ routes });
+  }
+
   return res.json({ message: 'Delivery updated', delivery });
 });
 

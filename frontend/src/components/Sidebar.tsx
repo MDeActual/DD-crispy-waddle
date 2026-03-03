@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { path: '/map', label: 'Map', icon: '🗺️', roles: ['admin', 'dispatcher', 'driver'] },
   { path: '/deliveries', label: 'Deliveries', icon: '📦', roles: ['admin', 'dispatcher'] },
   { path: '/drivers', label: 'Drivers', icon: '🚚', roles: ['admin'] },
+  { path: '/audit', label: 'Audit Chain', icon: '🔗', roles: ['admin', 'dispatcher'] },
   { path: '/users', label: 'Users', icon: '👥', roles: ['admin'] },
 ];
 

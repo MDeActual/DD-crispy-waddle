@@ -7,6 +7,7 @@ const STATUS_COLORS: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
   inactive: 'bg-gray-100 text-gray-800',
   on_delivery: 'bg-blue-100 text-blue-800',
+  incident: 'bg-red-100 text-red-800',
 };
 
 const DriversPage: React.FC = () => {
@@ -15,7 +16,7 @@ const DriversPage: React.FC = () => {
 
   useEffect(() => {
     driversApi.getAll()
-      .then((r) => setDrivers(r.data))
+      .then((r) => setDrivers(r.data.drivers ?? r.data))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);

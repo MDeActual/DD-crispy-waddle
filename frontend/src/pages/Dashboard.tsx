@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import L from 'leaflet';
 import { deliveriesApi, driversApi } from '../services/api';
 import type { Delivery, Driver } from '../types';
+import RoutePanel from '../components/RoutePanel';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -46,8 +47,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     Promise.all([deliveriesApi.getAll(), driversApi.getAll()])
       .then(([dRes, drRes]) => {
-        setDeliveries(dRes.data);
-        setDrivers(drRes.data);
+        setDeliveries(dRes.data.deliveries ?? dRes.data);
+        setDrivers(drRes.data.drivers ?? drRes.data);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -140,6 +141,9 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Route Optimizer */}
+      <RoutePanel />
     </div>
   );
 };

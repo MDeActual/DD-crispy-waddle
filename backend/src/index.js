@@ -7,6 +7,8 @@ const socketService = require('./socket');
 const authRoutes = require('./routes/auth');
 const driverRoutes = require('./routes/drivers');
 const deliveryRoutes = require('./routes/deliveries');
+const routeRoutes = require('./routes/routes');
+const auditRoutes = require('./routes/audit');
 
 const PORT = process.env.PORT || 3001;
 
@@ -50,6 +52,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/drivers', apiLimiter, driverRoutes);
 app.use('/api/deliveries', apiLimiter, deliveryRoutes);
+app.use('/api/routes', apiLimiter, routeRoutes);
+app.use('/api/audit', apiLimiter, auditRoutes);
 
 // 404 handler
 app.use((req, res) => {

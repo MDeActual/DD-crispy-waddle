@@ -20,4 +20,16 @@ function emitDeliveryUpdate(deliveryData) {
   }
 }
 
-module.exports = { init, getIO, emitLocationUpdate, emitDeliveryUpdate };
+function emitRouteUpdate(routeData) {
+  if (io) {
+    io.emit('route_update', routeData);
+  }
+}
+
+function emitIncident(incidentData) {
+  if (io) {
+    io.emit('driver_incident', incidentData);
+  }
+}
+
+module.exports = { init, getIO, emitLocationUpdate, emitDeliveryUpdate, emitRouteUpdate, emitIncident };
