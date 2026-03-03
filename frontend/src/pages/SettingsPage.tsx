@@ -22,7 +22,7 @@ const SettingsPage: React.FC = () => {
     try {
       const res = await authApi.setupMfa();
       setMfaSecret(res.data.secret);
-      setMfaQr(res.data.qr_code_url);
+      setMfaQr(res.data.qrCode);
       setMfaStep('setup');
     } catch (err: unknown) {
       setMfaError((err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to setup MFA');
