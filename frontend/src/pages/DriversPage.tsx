@@ -79,7 +79,7 @@ const DriversPage: React.FC = () => {
                   </td>
                   <td className="px-4 py-3">
                     {driver.lat !== null && driver.lng !== null && (
-                      <Link to="/map" state={{ flyTo: [driver.lat, driver.lng] }} className="text-blue-600 hover:text-blue-700 font-medium text-xs">
+                      <Link to={`/map?lat=${driver.lat}&lng=${driver.lng}`} className="text-blue-600 hover:text-blue-700 font-medium text-xs">
                         View on Map
                       </Link>
                     )}

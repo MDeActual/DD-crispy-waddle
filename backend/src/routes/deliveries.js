@@ -1,5 +1,5 @@
 const express = require('express');
-const { deliveries } = require('../store');
+const { deliveries, drivers } = require('../store');
 const { authenticate, requireRole } = require('../middleware');
 const { emitDeliveryUpdate } = require('../socket');
 
@@ -14,7 +14,6 @@ router.get('/', authenticate, (req, res) => {
   }
 
   // Drivers see only their own deliveries
-  const { drivers } = require('../store');
   const driver = drivers.find((d) => d.userId === req.user.id);
   if (!driver) {
     return res.json({ deliveries: [] });
@@ -32,7 +31,6 @@ router.get('/:id', authenticate, (req, res) => {
   }
 
   if (req.user.role === 'driver') {
-    const { drivers } = require('../store');
     const driver = drivers.find((d) => d.userId === req.user.id);
     if (!driver || delivery.driverId !== driver.id) {
       return res.status(403).json({ error: 'Insufficient permissions' });
@@ -87,7 +85,6 @@ router.put('/:id', authenticate, (req, res) => {
 
   if (req.user.role === 'driver') {
     // Drivers can only update status of their own deliveries
-    const { drivers } = require('../store');
     const driver = drivers.find((d) => d.userId === req.user.id);
     if (!driver || delivery.driverId !== driver.id) {
       return res.status(403).json({ error: 'Drivers can only update their own deliveries' });
