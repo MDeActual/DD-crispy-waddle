@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useLocation } from 'react-router-dom';
 import L from 'leaflet';
 import { deliveriesApi, driversApi } from '../services/api';
 import type { Delivery, Driver, MapProvider } from '../types';
@@ -31,11 +32,22 @@ const FlyToLocation: React.FC<{ location: [number, number] | null }> = ({ locati
 };
 
 const MapPage: React.FC = () => {
+  const location = useLocation();
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [mapProvider, setMapProvider] = useState<MapProvider>('osm');
-  const [flyTo] = useState<[number, number] | null>(null);
+  const [flyTo, setFlyTo] = useState<[number, number] | null>(null);
   const mapboxKey = localStorage.getItem('mapbox_key') || '';
+
+  // Support navigation from DriversPage: /map?lat=xx&lng=yy
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const lat = parseFloat(params.get('lat') || '');
+    const lng = parseFloat(params.get('lng') || '');
+    if (!isNaN(lat) && !isNaN(lng)) {
+      setFlyTo([lat, lng]);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     driversApi.getAll().then((r) => setDrivers(r.data)).catch(console.error);
